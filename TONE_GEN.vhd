@@ -12,6 +12,7 @@ LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.STD_LOGIC_ARITH.ALL;
 USE IEEE.STD_LOGIC_UNSIGNED.ALL;
+USE ieee.numeric_std.all;
 
 LIBRARY ALTERA_MF;
 USE ALTERA_MF.ALTERA_MF_COMPONENTS.ALL;
@@ -20,20 +21,27 @@ USE ALTERA_MF.ALTERA_MF_COMPONENTS.ALL;
 ENTITY TONE_GEN IS 
 	PORT
 	(
-		CMD        : IN  STD_LOGIC_VECTOR(15 DOWNTO 0); --IO data
+		CMD        : INOUT  STD_LOGIC_VECTOR(15 DOWNTO 0); --IO data
 		CS         : IN  STD_LOGIC;
 		SAMPLE_CLK : IN  STD_LOGIC;
 		RESETN     : IN  STD_LOGIC;
 		L_DATA     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-		R_DATA     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
+		R_DATA     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+		IO_WRITE	  : IN STD_LOGIC;
+		KEY2		  : IN STD_LOGIC; --Volume Down
+		KEY3		  : IN STD_LOGIC  --Volume Up
 	);
 END TONE_GEN;
 
 ARCHITECTURE gen OF TONE_GEN IS 
 
-	SIGNAL phase_register : STD_LOGIC_VECTOR(12 DOWNTO 0); --changed, but may not compile
-	SIGNAL tuning_word    : STD_LOGIC_VECTOR(6 DOWNTO 0); --changed to make it 7-bit tuning word
+	SIGNAL phase_register : STD_LOGIC_VECTOR(15 DOWNTO 0); --changed, but may not compile
+	SIGNAL tuning_word    : STD_LOGIC_VECTOR(12 DOWNTO 0); --changed to make it 7-bit tuning word
 	SIGNAL sounddata      : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	SIGNAL KEY_PRESSED    : STD_LOGIC;
+	SIGNAL R_DATA_SHIFT   : STD_LOGIC_VECTOR(15 DOWNTO 0);
+	SIGNAL L_DATA_SHIFT   : STD_LOGIC_VECTOR(15 DOWNTO 0);
+	SIGNAL counter 		 : STD_LOGIC_VECTOR(31 DOWNTO 0);
 	
 BEGIN
 
@@ -56,10 +64,25 @@ BEGIN
 		clock0 => NOT(SAMPLE_CLK),
 		-- In this design, one bit of the phase register is a fractional bit
 		-- will need to expand this part but will need to check how to...can i put in more bits into address_a?
-		address_a => phase_register(12 downto 5),
+		address_a => phase_register(15 downto 8),
 		q_a => sounddata -- output is amplitude
 	);
 	
+	CMD <=  CONV_STD_LOGIC_VECTOR(CONV_INTEGER(CONV_INTEGER("000" & tuning_word)*48000/65536),16) when
+			((CS = '1') AND (IO_WRITE = '0'))
+			ELSE "ZZZZZZZZZZZZZZZZ";
+	
+	KEY_PRESSED <= '1' WHEN (KEY2 = '1' OR KEY3 = '1') ELSE 
+						'0';
+	
+
+			
+			
+--R_DATA <= R_DATA_SHIFT WHEN (NOT(R_DATA_SHIFT = "ZZZZZZZZZZZZZZZZ")) ELSE 
+--			sounddata(7)&sounddata(7)&sounddata(7)&sounddata(7)&sounddata&"0000";
+--L_DATA <= L_DATA_SHIFT WHEN NOT(L_DATA_SHIFT = "ZZZZZZZZZZZZZZZZ") ELSE 
+--			sounddata(7)&sounddata(7)&sounddata(7)&sounddata(7)&sounddata&"0000";
+			
 	-- 8-bit sound data is used as bits 12-5 of the 16-bit output.
 	-- This is to prevent the output from being too loud.
 	-- for volume control, shift left/right?
@@ -73,156 +96,37 @@ BEGIN
 	R_DATA(11 DOWNTO 4) <= sounddata;
 	R_DATA(3 DOWNTO 0) <= "0000"; -- pad right side with 0s
 	
+
+--	PROCESS(KEY2,KEY3, KEY_PRESSED) BEGIN
+--		if (KEY3 = '1') AND (KEY2 = '0') AND NOT(R_DATA_SHIFT = (sounddata(7 downto 0) & "00000000")) THEN 
+--			R_DATA_SHIFT <= R_data_SHIFT(14 downto 0) & '0';
+--			L_DATA_SHIFT <= L_data_SHIFT(14 downto 0) & '0';
+--		ELSIF (kEY2 = '1') AND (KEY3 = '0')  AND NOT(R_DATA_SHIFT = (sounddata(7)&sounddata(7)&sounddata(7)&sounddata(7)&sounddata(7)&sounddata(7)&sounddata(7)&sounddata(7) & sounddata)) THEN
+--			R_DATA_SHIFT <= sounddata(7) & R_DATA_SHIFT(15 downto 1);
+--			L_DATA_SHIFT <= sounddata(7) & L_DATA_SHIFT(15 downto 1);
+--		ELSIF (((kEY2 = '0') and (KEY3='0') AND (KEY_PRESSED = '1'))  OR ((KEY2 = '1') AND (KEY3 = '1'))) THEN --none of the buttons have been pressed or both volume control pressed
+--			R_DATA_SHIFT <= R_DATA_SHIFT;
+--			L_DATA_SHIFT <= L_DATA_SHIFT;
+--		ELSE 	--first booted up
+--			R_DATA_SHIFT <= "ZZZZZZZZZZZZZZZZ";
+--			L_DATA_SHIFT <= "ZZZZZZZZZZZZZZZZ";
+--		END IF;
+--	END PROCESS;
+ 	
 	-- process to perform DDS
 	PROCESS(RESETN, SAMPLE_CLK) BEGIN
 		IF RESETN = '0' THEN
-			phase_register <= "0000000000000";
+			phase_register <= "0000000000000000";
+			counter <= x"00000000";
 		ELSIF RISING_EDGE(SAMPLE_CLK) THEN
-			IF tuning_word = "0000000" THEN  -- if command is 0, return to 0 output.
-				phase_register <= "0000000000000";
+			if (counter = x"0EE6B280") OR (tuning_word = "0000000000000") then  -- if command is 0, return to 0 output.
+				phase_register <= "0000000000000000";
+				counter <= x"00000000";
 			ELSE
 				-- Increment the phase register by the tuning word. 
 				--**CHANGE HERE
-				CASE tuning_word is
-					WHEN "0000001" =>
-						phase_register <= phase_register + "0000000010010";
-					WHEN "0000010" =>
-						phase_register <= phase_register + "0000000010011";
-					WHEN "0000011" =>
-						phase_register <= phase_register + "0000000010100";
-					WHEN "0000100" =>
-						phase_register <= phase_register + "0000000010101";
-					WHEN "0000101" =>
-						phase_register <= phase_register + "0000000010110";
-					WHEN "0000110" =>
-						phase_register <= phase_register + "0000000011000";
-					WHEN "0000111" =>
-						phase_register <= phase_register + "0000000011001";--25
-					WHEN "0001000" =>
-						phase_register <= phase_register + "0000000011011";
-					WHEN "0001001" =>
-						phase_register <= phase_register + "0000000011100";--28
-					WHEN "0001010" =>
-						phase_register <= phase_register + "0000000011110";--30
-					WHEN "0001011" =>
-						phase_register <= phase_register + "0000000100000"; --32
-					WHEN "0001100" =>
-						phase_register <= phase_register + "0000000100001";
-					WHEN "0001101" =>
-						phase_register <= phase_register + "0000000100011";--35
-					WHEN "0001110" =>
-						phase_register <= phase_register + "0000000100110";
-					WHEN "0001111" =>
-						phase_register <= phase_register + "0000000101000";
-					WHEN "0010000" =>
-						phase_register <= phase_register + "0000000101010";
-					WHEN "0010001" =>
-						phase_register <= phase_register + "0000000101101";
-					WHEN "0010010" =>
-						phase_register <= phase_register + "0000000101111";
-					WHEN "0010011" =>
-						phase_register <= phase_register + "0000000110010";--22
-					WHEN "0010100" =>
-						phase_register <= phase_register + "0000000110101";--53
-					WHEN "0010101" =>
-						phase_register <= phase_register + "0000000111000";--56
-					WHEN "0010110" =>
-						phase_register <= phase_register + "0000000111100";--60
-					WHEN "0010111" =>
-						phase_register <= phase_register + "0000000111111";--63
-					WHEN "0011000" =>
-						phase_register <= phase_register + "0000001000011";
-					WHEN "0011001" =>
-						phase_register <= phase_register + "0000001000111";--32
-					WHEN "0011010" =>
-						phase_register <= phase_register + "0000001001011";
-					WHEN "0011011" =>
-						phase_register <= phase_register + "0000001010000";--35
-					WHEN "0011100" =>
-						phase_register <= phase_register + "0000001010100";
-					WHEN "0011101" =>
-						phase_register <= phase_register + "0000001011001";--40
-					WHEN "0011110" =>
-						phase_register <= phase_register + "0000001011111";
-					WHEN "0011111" =>
-						phase_register <= phase_register + "0000001100100";--45
-					WHEN "0100000" =>
-						phase_register <= phase_register + "0000001101010";
-					WHEN "0100001" =>
-						phase_register <= phase_register + "0000001110001";--50
-					WHEN "0100010" =>
-						phase_register <= phase_register + "0000001110111";
-					WHEN "0100011" =>
-						phase_register <= phase_register + "0000001111110";--56
-					WHEN "0100100" =>
-						phase_register <= phase_register + "0000010000110";--60
-					WHEN "0100101" =>
-						phase_register <= phase_register + "0000010001110";
-					WHEN "0100110" =>
-						phase_register <= phase_register + "0000010010110"; --67
-					WHEN "0100111" =>
-						phase_register <= phase_register + "0000010011111";
-					WHEN "0101000" =>
-						phase_register <= phase_register + "0000010101001";--75
-					WHEN "0101001" =>
-						phase_register <= phase_register + "0000010110011";--80
-					WHEN "0101010" =>
-						phase_register <= phase_register + "0000010111101";
-					WHEN "0101011" =>
-						phase_register <= phase_register + "0000011001000";
-					WHEN "0101100" =>
-						phase_register <= phase_register + "0000011010100";
-					WHEN "0101101" =>
-						phase_register <= phase_register + "0000011100001";--100
-					WHEN "0101110" =>
-						phase_register <= phase_register + "0000011101110";
-					WHEN "0101111" =>
-						phase_register <= phase_register + "0000011111101";--113
-					WHEN "0110000" =>
-						phase_register <= phase_register + "0000100001100";--119
-					WHEN "0110001" =>
-						phase_register <= phase_register + "0000100011100";--126
-					WHEN "0110010" =>
-						phase_register <= phase_register + "0000100101100";--134
-					WHEN "0110011" =>
-						phase_register <= phase_register + "0000100111110";--142
-					WHEN "0110100" =>
-						phase_register <= phase_register + "0000101010001";--150
-					WHEN "0110101" =>
-						phase_register <= phase_register + "0000101100101";--159
-					WHEN "0110110" =>
-						phase_register <= phase_register + "0000101111010";
-					WHEN "0110111" =>
-						phase_register <= phase_register + "0000110010001";
-					WHEN "0111000" =>
-						phase_register <= phase_register + "0000110101001";--189
-					WHEN "0111001" =>
-						phase_register <= phase_register + "0000111000010";
-					WHEN "0111010" =>
-						phase_register <= phase_register + "0000111011101";--477
-					WHEN "0111011" =>
-						phase_register <= phase_register + "0000111111001";
-					WHEN "0111100" =>
-						phase_register <= phase_register + "0001000010111";
-					WHEN "0111101" =>
-						phase_register <= phase_register + "0001000110111";
-					WHEN "0111110" =>
-						phase_register <= phase_register + "0001001011001";
-					WHEN "0111111" =>
-						phase_register <= phase_register + "0001001111100";
-					WHEN "1000000" =>
-						phase_register <= phase_register + "0001010100010";
-					WHEN "1000001" =>
-						phase_register <= phase_register + "0001011001010";
-					WHEN "1000010" =>
-						phase_register <= phase_register + "0001011110101";
-					WHEN "1000011" =>
-						phase_register <= phase_register + "0001100100010";
-					WHEN "1000100" =>
-						phase_register <= phase_register + "0001101010010";
-					WHEN OTHERS =>
-						phase_register <= "0000000000000";
-				END CASE;
+				phase_register <= phase_register + tuning_word;
+				counter <= counter + 1;
 			END IF;
 		END IF;
 	END PROCESS;
@@ -230,9 +134,14 @@ BEGIN
 	-- process to latch command data from SCOMP
 	PROCESS(RESETN, CS) BEGIN
 		IF RESETN = '0' THEN
-			tuning_word <= "0000000";
+			tuning_word <= "0000000000000";
 		ELSIF RISING_EDGE(CS) THEN
-			tuning_word <= CMD(6 DOWNTO 0);
+			IF IO_WRITE = '1' THEN
+				tuning_word <= CONV_STD_LOGIC_VECTOR(CONV_INTEGER(CONV_INTEGER(CMD)*65536/48000), 13);
+			END IF;
 		END IF;
 	END PROCESS;
+	
+
+		
 END gen;
