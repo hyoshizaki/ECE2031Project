@@ -10,16 +10,93 @@ CONTENT
   BEGIN
     [000..7FF] : 0000;  -- Default to NOP
 
-           000 : 9000;  -- 	IN     Switches
-           001 : 9840;  -- 	OUT    Beep
-           002 : 8004;  -- 	CALL   Delay
-           003 : 2800;  -- 	JUMP   0
-           004 : 9802;  -- 	OUT    Timer
-           005 : 9002;  -- 	IN     Timer
-           006 : 6FFE;  -- 	ADDI   -2
-           007 : 3005;  -- 	JNEG   WaitingLoop
-           008 : 8800;  -- 	RETURN
-           009 : 0000;  -- Pattern:   DW 0
-           00A : 0001;  -- Bit0:      DW &B0000000001
-           00B : 0200;  -- Bit9:      DW &B1000000000
+           000 : 9000;  -- 	IN Switches
+           001 : 3807;  -- 	JPOS SomeNote
+           002 : B800;  -- 	LOADI 0
+           003 : 1006;  -- 	STORE Temp
+           004 : 9840;  -- 	OUT Beep
+           005 : 8045;  -- 	CALL Delay
+           006 : 283F;  -- 	JUMP End
+           007 : 9000;  -- 	IN Switches
+           008 : 4851;  -- 	AND Bit0
+           009 : 400F;  -- 	JZERO NotC4
+           00A : 084A;  -- 	LOAD C4
+           00B : 1006;  -- 	STORE Temp
+           00C : 9840;  -- 	OUT Beep
+           00D : 8045;  -- 	CALL Delay
+           00E : 283F;  -- 	JUMP End
+           00F : 9000;  -- 	IN Switches
+           010 : 4852;  -- 	AND Bit1
+           011 : 4017;  -- 	JZERO NotD4
+           012 : 084B;  -- 	LOAD D4
+           013 : 1006;  -- 	STORE Temp
+           014 : 9840;  -- 	OUT Beep
+           015 : 8045;  -- 	CALL Delay
+           016 : 283F;  -- 	JUMP End
+           017 : 9000;  -- 	IN Switches
+           018 : 4853;  -- 	AND Bit2
+           019 : 401F;  -- 	JZERO NotE4
+           01A : 084C;  -- 	LOAD E4
+           01B : 1006;  -- 	STORE Temp
+           01C : 9840;  -- 	OUT Beep
+           01D : 8045;  -- 	CALL Delay
+           01E : 283F;  -- 	JUMP End
+           01F : 9000;  -- 	IN Switches
+           020 : 4854;  -- 	AND Bit3
+           021 : 4027;  -- 	JZERO NotF4
+           022 : 084D;  -- 	LOAD F4
+           023 : 1006;  -- 	STORE Temp
+           024 : 9840;  -- 	OUT Beep
+           025 : 8045;  -- 	CALL Delay
+           026 : 283F;  -- 	JUMP End
+           027 : 9000;  -- 	IN Switches
+           028 : 4855;  -- 	AND Bit4
+           029 : 402F;  -- 	JZERO NotG4
+           02A : 084E;  -- 	LOAD G4
+           02B : 1006;  -- 	STORE Temp
+           02C : 9840;  -- 	OUT Beep
+           02D : 8045;  -- 	CALL Delay
+           02E : 283F;  -- 	JUMP End
+           02F : 9000;  -- 	IN Switches
+           030 : 4856;  -- 	AND Bit5
+           031 : 4037;  -- 	JZERO NotA4
+           032 : 084F;  -- 	LOAD A4
+           033 : 1006;  -- 	STORE Temp
+           034 : 9840;  -- 	OUT Beep
+           035 : 8045;  -- 	CALL Delay
+           036 : 283F;  -- 	JUMP End
+           037 : 9000;  -- 	IN Switches
+           038 : 4857;  -- 	AND Bit6
+           039 : 4000;  -- 	JZERO 0
+           03A : 0850;  -- 	LOAD B4
+           03B : 1006;  -- 	STORE Temp
+           03C : 9840;  -- 	OUT Beep
+           03D : 8045;  -- 	CALL Delay
+           03E : 283F;  -- 	JUMP End
+           03F : 9040;  -- 	IN Beep
+           040 : 1007;  -- 	STORE Note
+           041 : 0806;  -- 	LOAD Temp
+           042 : 2007;  -- 	SUB Note
+           043 : 9804;  -- 	OUT Hex0
+           044 : 2800;  -- 	Jump 0
+           045 : 9802;  -- 	OUT    Timer
+           046 : 9002;  -- 	IN     Timer
+           047 : 6FFE;  -- 	ADDI   -2
+           048 : 3046;  -- 	JNEG   WaitingLoop
+           049 : 8800;  -- 	RETURN
+           04A : 0041;  -- C4:		   DW 65
+           04B : 0049;  -- D4: 	   DW 73
+           04C : 0052;  -- E4:		   DW 82
+           04D : 0057;  -- F4:  	   DW 87
+           04E : 0062;  -- G4:		   DW 98
+           04F : 006E;  -- A4:		   DW 110
+           050 : 007B;  -- B4:		   DW 123
+           051 : 0001;  -- Bit0:      DW &B0000000001
+           052 : 0002;  -- Bit1:      DW &B0000000010
+           053 : 0004;  -- Bit2:      DW &B0000000100
+           054 : 0008;  -- Bit3:      DW &B0000001000
+           055 : 0010;  -- Bit4:      DW &B0000010000
+           056 : 0020;  -- Bit5:      DW &B0000100000
+           057 : 0040;  -- Bit6:      DW &B0001000000
+           058 : 01FF;  -- AbsoluteValue:	DW &B0111111111
   END;
