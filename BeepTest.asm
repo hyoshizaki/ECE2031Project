@@ -75,48 +75,56 @@ FindOctave:
 
 FirstOctave:
       LOAD Temp
+      ILOAD 135 
       Out Beep
       CALL Delay
       JUMP 0
 SecondOctave:
       LOAD Temp
       SHIFT 1
+      ILOAD 146
       OUT Beep
       CALL Delay
       JUMP 0
 ThirdOctave:
       LOAD Temp
       SHIFT 2
+      ILOAD 164
       OUT Beep
       CALL Delay
       JUMP 0
 FourthOctave:
       LOAD Temp
       SHIFT 3
+      ILOAD 174
       OUT Beep
       CALL Delay
       JUMP 0
 FifthOctave:
       LOAD Temp
       SHIFT 4
+      ILOAD 196
       OUT Beep
       CALL Delay
       JUMP 0      
 SixthOctave:
       LOAD Temp
       SHIFT 5
+      ILOAD 220
       OUT Beep
       CALL Delay
       JUMP 0
 SeventhOctave:
       LOAD Temp
       SHIFT 6
+      ILOAD 246
       OUT Beep
       CALL Delay
       JUMP 0
 EigthOctave:
       LOAD Temp
       SHIFT 7
+      ILOAD 272
       OUT Beep
       CALL Delay
       JUMP 0
