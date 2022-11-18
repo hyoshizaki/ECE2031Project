@@ -82,53 +82,59 @@ FindOctave:
 
 FirstOctave:
 	LOAD Temp
-	Out Beep
+	OUT Beep
+	OUT Hex0
 	CALL Delay
 	JUMP 0
 SecondOctave:
 	LOAD Temp
 	SHIFT 1
 	OUT Beep
+	OUT Hex0
 	CALL Delay
 	JUMP 0
 ThirdOctave:
 	LOAD Temp
 	SHIFT 2
 	OUT Beep
+	OUT Hex0
 	CALL Delay
 	JUMP 0
 FourthOctave:
 	LOAD Temp
 	SHIFT 3
 	OUT Beep
+	OUT Hex0
 	CALL Delay
 	JUMP 0
 FifthOctave:
 	LOAD Temp
 	SHIFT 4
 	OUT Beep
+	OUT Hex0
 	CALL Delay
 	JUMP 0
 SixthOctave:
 	LOAD Temp
 	SHIFT 5
 	OUT Beep
+	OUT Hex0
 	CALL Delay
 	JUMP 0
 SeventhOctave:
 	LOAD Temp
 	SHIFT 6
 	OUT Beep
+	OUT Hex0
 	CALL Delay
 	JUMP 0
 EigthOctave:
 	LOAD Temp
 	SHIFT 7
 	OUT Beep
+	OUT Hex0
 	CALL Delay
 	JUMP 0
-
-
 
 
 ; Subroutine to delay for 0.2 seconds.
@@ -146,21 +152,16 @@ LEDs:      EQU 001
 Timer:     EQU 002
 Hex0:      EQU 004
 Hex1:      EQU 005
-Beep:      EQU &H40
 Temp:      EQU 006
-
-
-Mask012:   DW &B0000000111
-
+Beep:      EQU &H40
 
 C4:  	   DW 65
 D4:        DW 73
 E4:  	   DW 82
 F4:        DW 87
-G4:   		DW 98
-A4:   		DW 110
-B4:   		DW 123
-
+G4:   	   DW 98
+A4:   	   DW 110
+B4:   	   DW 123
 
 Bit0:      DW &B0000001000
 Bit1:      DW &B0000010000
@@ -169,3 +170,5 @@ Bit3:      DW &B0001000000
 Bit4:      DW &B0010000000
 Bit5:      DW &B0100000000
 Bit6:      DW &B1000000000
+
+Mask012:   DW &B0000000111
