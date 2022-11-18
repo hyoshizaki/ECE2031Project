@@ -11,92 +11,135 @@ CONTENT
     [000..7FF] : 0000;  -- Default to NOP
 
            000 : 9000;  -- 	IN Switches
-           001 : 3807;  -- 	JPOS SomeNote
-           002 : B800;  -- 	LOADI 0
-           003 : 1006;  -- 	STORE Temp
+           001 : 3809;  -- 	JPOS SomeNote
+           002 : 3009;  -- 	JNEG SomeNote
+           003 : B800;  -- 	LOADI 0
            004 : 9840;  -- 	OUT Beep
-           005 : 8045;  -- 	CALL Delay
-           006 : 283F;  -- 	JUMP End
-           007 : 9000;  -- 	IN Switches
-           008 : 4851;  -- 	AND Bit0
-           009 : 400F;  -- 	JZERO NotC4
-           00A : 084A;  -- 	LOAD C4
-           00B : 1006;  -- 	STORE Temp
-           00C : 9840;  -- 	OUT Beep
-           00D : 8045;  -- 	CALL Delay
-           00E : 283F;  -- 	JUMP End
+           005 : 9040;  -- 	IN Beep
+           006 : 6800;  -- 	ADDI 0
+           007 : 9804;  -- 	OUT Hex0
+           008 : 2800;  -- 	JUMP 0
+           009 : 9000;  -- 	IN Switches
+           00A : 487C;  -- 	AND Bit0
+           00B : 400F;  -- 	JZERO NotC2
+           00C : 0874;  -- 	LOAD C2
+           00D : 107B;  -- 	STORE Note
+           00E : 2833;  -- 	JUMP FindOctave
            00F : 9000;  -- 	IN Switches
-           010 : 4852;  -- 	AND Bit1
-           011 : 4017;  -- 	JZERO NotD4
-           012 : 084B;  -- 	LOAD D4
-           013 : 1006;  -- 	STORE Temp
-           014 : 9840;  -- 	OUT Beep
-           015 : 8045;  -- 	CALL Delay
-           016 : 283F;  -- 	JUMP End
-           017 : 9000;  -- 	IN Switches
-           018 : 4853;  -- 	AND Bit2
-           019 : 401F;  -- 	JZERO NotE4
-           01A : 084C;  -- 	LOAD E4
-           01B : 1006;  -- 	STORE Temp
-           01C : 9840;  -- 	OUT Beep
-           01D : 8045;  -- 	CALL Delay
-           01E : 283F;  -- 	JUMP End
-           01F : 9000;  -- 	IN Switches
-           020 : 4854;  -- 	AND Bit3
-           021 : 4027;  -- 	JZERO NotF4
-           022 : 084D;  -- 	LOAD F4
-           023 : 1006;  -- 	STORE Temp
-           024 : 9840;  -- 	OUT Beep
-           025 : 8045;  -- 	CALL Delay
-           026 : 283F;  -- 	JUMP End
+           010 : 487D;  -- 	AND Bit1
+           011 : 4015;  -- 	JZERO NotD2
+           012 : 0875;  -- 	LOAD D2
+           013 : 107B;  -- 	STORE Note
+           014 : 2833;  -- 	JUMP FindOctave
+           015 : 9000;  -- 	IN Switches
+           016 : 487E;  -- 	AND Bit2
+           017 : 401B;  -- 	JZERO NotE2
+           018 : 0876;  -- 	LOAD E2
+           019 : 107B;  -- 	STORE Note
+           01A : 2833;  -- 	JUMP FindOctave
+           01B : 9000;  -- 	IN Switches
+           01C : 487F;  -- 	AND Bit3
+           01D : 4021;  -- 	JZERO NotF2
+           01E : 0877;  -- 	LOAD F2
+           01F : 107B;  -- 	STORE Note
+           020 : 2833;  -- 	JUMP FindOctave
+           021 : 9000;  -- 	IN Switches
+           022 : 4880;  -- 	AND Bit4
+           023 : 4027;  -- 	JZERO NotG2
+           024 : 0878;  -- 	LOAD G2
+           025 : 107B;  -- 	STORE Note
+           026 : 2833;  -- 	JUMP FindOctave
            027 : 9000;  -- 	IN Switches
-           028 : 4855;  -- 	AND Bit4
-           029 : 402F;  -- 	JZERO NotG4
-           02A : 084E;  -- 	LOAD G4
-           02B : 1006;  -- 	STORE Temp
-           02C : 9840;  -- 	OUT Beep
-           02D : 8045;  -- 	CALL Delay
-           02E : 283F;  -- 	JUMP End
-           02F : 9000;  -- 	IN Switches
-           030 : 4856;  -- 	AND Bit5
-           031 : 4037;  -- 	JZERO NotA4
-           032 : 084F;  -- 	LOAD A4
-           033 : 1006;  -- 	STORE Temp
-           034 : 9840;  -- 	OUT Beep
-           035 : 8045;  -- 	CALL Delay
-           036 : 283F;  -- 	JUMP End
-           037 : 9000;  -- 	IN Switches
-           038 : 4857;  -- 	AND Bit6
-           039 : 4000;  -- 	JZERO 0
-           03A : 0850;  -- 	LOAD B4
-           03B : 1006;  -- 	STORE Temp
-           03C : 9840;  -- 	OUT Beep
-           03D : 8045;  -- 	CALL Delay
-           03E : 283F;  -- 	JUMP End
-           03F : 9040;  -- 	IN Beep
-           040 : 1007;  -- 	STORE Note
-           041 : 0806;  -- 	LOAD Temp
-           042 : 2007;  -- 	SUB Note
-           043 : 9804;  -- 	OUT Hex0
-           044 : 2800;  -- 	Jump 0
-           045 : 9802;  -- 	OUT    Timer
-           046 : 9002;  -- 	IN     Timer
-           047 : 6FFE;  -- 	ADDI   -2
-           048 : 3046;  -- 	JNEG   WaitingLoop
-           049 : 8800;  -- 	RETURN
-           04A : 0041;  -- C4:		   DW 65
-           04B : 0049;  -- D4: 	   DW 73
-           04C : 0052;  -- E4:		   DW 82
-           04D : 0057;  -- F4:  	   DW 87
-           04E : 0062;  -- G4:		   DW 98
-           04F : 006E;  -- A4:		   DW 110
-           050 : 007B;  -- B4:		   DW 123
-           051 : 0001;  -- Bit0:      DW &B0000000001
-           052 : 0002;  -- Bit1:      DW &B0000000010
-           053 : 0004;  -- Bit2:      DW &B0000000100
-           054 : 0008;  -- Bit3:      DW &B0000001000
-           055 : 0010;  -- Bit4:      DW &B0000010000
-           056 : 0020;  -- Bit5:      DW &B0000100000
-           057 : 0040;  -- Bit6:      DW &B0001000000
-           058 : 01FF;  -- AbsoluteValue:	DW &B0111111111
+           028 : 4881;  -- 	AND Bit5
+           029 : 402D;  -- 	JZERO NotA2
+           02A : 0879;  -- 	LOAD A2
+           02B : 107B;  -- 	STORE Note
+           02C : 2833;  -- 	JUMP FindOctave
+           02D : 9000;  -- 	IN Switches
+           02E : 4882;  -- 	AND Bit6
+           02F : 4000;  -- 	JZERO 0
+           030 : 087A;  -- 	LOAD B2
+           031 : 107B;  -- 	STORE Note
+           032 : 2833;  -- 	JUMP FindOctave
+           033 : 9000;  -- 	IN Switches
+           034 : 4883;  -- 	AND Mask012
+           035 : 4045;  -- 	JZERO FirstOctave
+           036 : 6FFF;  -- 	ADDI -1
+           037 : 4048;  -- 	JZERO SecondOctave
+           038 : 6FFF;  -- 	ADDI -1
+           039 : 404D;  -- 	JZERO ThirdOctave
+           03A : 6FFF;  -- 	ADDI -1
+           03B : 4052;  -- 	JZERO FourthOctave
+           03C : 6FFF;  -- 	ADDI -1
+           03D : 4057;  -- 	JZERO FifthOctave
+           03E : 6FFF;  -- 	ADDI -1
+           03F : 405C;  -- 	JZERO SixthOctave
+           040 : 6FFF;  -- 	ADDI -1
+           041 : 4061;  -- 	JZERO SeventhOctave
+           042 : 6FFF;  -- 	ADDI -1
+           043 : 4066;  -- 	JZERO EigthOctave
+           044 : 2800;  -- 	JUMP 0
+           045 : 087B;  -- 	LOAD Note
+           046 : 9840;  -- 	OUT Beep
+           047 : 286B;  -- 	JUMP End
+           048 : 087B;  -- 	LOAD Note
+           049 : 6001;  -- 	SHIFT 1
+           04A : 107B;  -- 	STORE Note
+           04B : 9840;  -- 	OUT Beep
+           04C : 286B;  -- 	JUMP End
+           04D : 087B;  -- 	LOAD Note
+           04E : 6002;  -- 	SHIFT 2
+           04F : 107B;  -- 	STORE Note
+           050 : 9840;  -- 	OUT Beep
+           051 : 286B;  -- 	JUMP End
+           052 : 087B;  -- 	LOAD Note
+           053 : 6003;  -- 	SHIFT 3
+           054 : 107B;  -- 	STORE Note
+           055 : 9840;  -- 	OUT Beep
+           056 : 286B;  -- 	JUMP End
+           057 : 087B;  -- 	LOAD Note
+           058 : 6004;  -- 	SHIFT 4
+           059 : 107B;  -- 	STORE Note
+           05A : 9840;  -- 	OUT Beep
+           05B : 286B;  -- 	JUMP End
+           05C : 087B;  -- 	LOAD Note
+           05D : 6005;  -- 	SHIFT 5
+           05E : 107B;  -- 	STORE Note
+           05F : 9840;  -- 	OUT Beep
+           060 : 286B;  -- 	JUMP End
+           061 : 087B;  -- 	LOAD Note
+           062 : 6006;  -- 	SHIFT 6
+           063 : 107B;  -- 	STORE Note
+           064 : 9840;  -- 	OUT Beep
+           065 : 286B;  -- 	JUMP End
+           066 : 087B;  -- 	LOAD Note
+           067 : 6007;  -- 	SHIFT 7
+           068 : 107B;  -- 	STORE Note
+           069 : 9840;  -- 	OUT Beep
+           06A : 286B;  -- 	JUMP End
+           06B : 9040;  -- 	IN Beep	
+           06C : 207B;  -- 	SUB Note
+           06D : 9804;  -- 	OUT Hex0 ;REMOVED RN FOR DEBUGGING
+           06E : 2800;  -- 	JUMP 0
+           06F : 9802;  -- 	OUT    Timer
+           070 : 9002;  -- 	IN     Timer
+           071 : 6FFE;  -- 	ADDI   -2
+           072 : 3070;  -- 	JNEG   WaitingLoop
+           073 : 8800;  -- 	RETURN
+           074 : 0041;  -- C2:  	   DW 65
+           075 : 0049;  -- D2:        DW 73
+           076 : 0052;  -- E2:  	   DW 82
+           077 : 0057;  -- F2:        DW 87
+           078 : 0062;  -- G2:   	   DW 98
+           079 : 006E;  -- A2:   	   DW 110
+           07A : 007B;  -- B2:   	   DW 123
+           07B : 0000;  -- Note:	   DW 0
+           07C : 0008;  -- Bit0:      DW &B0000001000
+           07D : 0010;  -- Bit1:      DW &B0000010000
+           07E : 0020;  -- Bit2:      DW &B0000100000
+           07F : 0040;  -- Bit3:      DW &B0001000000
+           080 : 0080;  -- Bit4:      DW &B0010000000
+           081 : 0100;  -- Bit5:      DW &B0100000000
+           082 : 0200;  -- Bit6:      DW &B1000000000
+           083 : 0007;  -- Mask012:   DW &B111
   END;
